@@ -1,0 +1,595 @@
+﻿<Window x:Class="WPF进程管理器.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF进程管理器"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="480" Width="720"
+        MinHeight="480" MinWidth="720"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        BorderThickness="0"
+        AllowsTransparency="True" Background="#00000000">
+    <!--
+    WindowStartupLocation="CenterScreen"出现在屏幕中心
+    WindowStyle="None"隐藏窗口边框和标题栏
+    BorderThickness="0" - 表示窗口边框宽度为0
+    AllowsTransparency="True" - 表示允许窗口的透明和半透明效果
+    -->
+    <Window.Resources>
+        <!--窗口按钮-->
+        <Style TargetType="Button" x:Key="WindowButton">
+            <Setter Property="Background" Value="#212121"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="20"
+                            SnapsToDevicePixels="true"
+                                    Width="40"
+                                    Height="40">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"
+                                          Margin="2,2"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#454545"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#454545"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--添加按钮-->
+        <Style TargetType="Button" x:Key="AddButton">
+            <Setter Property="Background" Value="#454545"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="BorderThickness" Value="2"></Setter>
+            <Setter Property="BorderBrush" Value="White"></Setter>
+            <Setter Property="VerticalAlignment" Value="Bottom"></Setter>
+            <Setter Property="FontStyle" Value="Oblique"></Setter>
+            <Setter Property="FontSize" Value="13"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="15"
+                            SnapsToDevicePixels="true"
+                                    Width="90"
+                                    Height="30">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#6b6b6b"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#6b6b6b"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--中部按钮-->
+        <Style TargetType="Button" x:Key="MiscButton">
+            <Setter Property="Background" Value="#303030"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="FontStyle" Value="Oblique"></Setter>
+            <Setter Property="Opacity" Value="0.7"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            SnapsToDevicePixels="true"
+                                    Width="30"
+                                    Height="30"
+                                    Margin="5,0,0,0">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#6b6b6b"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#6b6b6b"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--进程选项按钮-->
+        <Style TargetType="Button" x:Key="ProcessButton">
+            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="FontSize" Value="15"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            SnapsToDevicePixels="true"
+                                    Width="20"
+                                    Height="20">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#646464"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#646464"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--弹窗按钮-->
+        <Style TargetType="Button" x:Key="PopupButton">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="ButtonBorder"
+                            Background="#303030"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            SnapsToDevicePixels="true"
+                                    Width="{TemplateBinding Width}"
+                                    Height="{TemplateBinding Height}"
+                                    Padding="5">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#646464"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#404040"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--MenuItem-->
+        <Style TargetType="MenuItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Grid Height="25" Background="Transparent" Width="{TemplateBinding Width}">
+                            <Border CornerRadius="5" x:Name="_border"   Grid.ColumnSpan="2"/>
+                            <TextBlock Foreground="#a1a1a1" Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Center" x:Name="_txt" Text="{Binding Header,RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="_border" Property="Background" Value="#505050"/>
+                                <Setter TargetName="_txt" Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--右键菜单-->
+        <ControlTemplate TargetType="ContextMenu" x:Key="ContextMenu">
+            <Border CornerRadius="5" Width="60" Height="50" Opacity="0.8"
+          Background="#303030" BorderBrush="#a6a6a6" BorderThickness="0.5">
+                <StackPanel>
+                    <MenuItem Header="⚙编辑" Click="WriteProcess" Foreground="White" Height="25"/>
+                    <MenuItem Header="🗑删除" Click="DeleteProcess" Foreground="White" Height="25"/>
+                </StackPanel>
+            </Border>
+        </ControlTemplate>
+        <Style TargetType="ToolTip">
+            <Setter Property="Background" Value="#303030" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Grid>
+                            <Border x:Name="ButtonBorder" Padding="5"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3"
+                            SnapsToDevicePixels="true"
+                                    Width="Auto"
+                                    Height="30">
+                                <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- ScrollViewer 滚动条 -->
+        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid>
+                            <!--滚动条颜色-->
+                            <Border Background="#646465" CornerRadius="3"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="HorizontalScrollBarPageButton" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Opacity" Value="0.2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Rectangle Fill="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="VerticalScrollBarPageButton" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Opacity" Value="0.2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Rectangle Fill="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--滚动条上下按钮-->
+        <Style x:Key="VerticalScrollBarPageButton2" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle"  Value="true"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Opacity"  Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Rectangle Fill="#90000000" Width="0" Height="0"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="for_scrollbar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="0,1,1,6"/>
+            <Setter Property="Width"  Value="10"/>
+            <Setter Property="MinWidth"  Value="5"/>
+            <Setter Property="Opacity"   Value="0.2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                                <RowDefinition Height="auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <RepeatButton  Grid.Row="0" Style="{StaticResource VerticalScrollBarPageButton2}" Command="{x:Static ScrollBar.PageUpCommand}"/>
+                            <Track x:Name="PART_Track"   Grid.Row="1" IsEnabled="{TemplateBinding IsMouseOver}" IsDirectionReversed="true">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource VerticalScrollBarPageButton}" Command="{x:Static ScrollBar.PageUpCommand}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource VerticalScrollBarPageButton}" Command="{x:Static ScrollBar.PageDownCommand}"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                            <RepeatButton Grid.Row="2" Style="{StaticResource VerticalScrollBarPageButton2}" Command="{x:Static ScrollBar.PageDownCommand}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Background"  Value="Transparent"/>
+                    <Setter Property="Margin" Value="1,0,6,1"/>
+                    <Setter Property="Height"   Value="5"/>
+                    <Setter Property="MinHeight"  Value="5"/>
+                    <Setter Property="Width"    Value="Auto"/>
+                    <Setter Property="Opacity" Value="0.2"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid x:Name="Bg" SnapsToDevicePixels="true">
+                                    <Track x:Name="PART_Track" IsEnabled="{TemplateBinding IsMouseOver}">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Style="{StaticResource HorizontalScrollBarPageButton}"  Command="{x:Static ScrollBar.PageLeftCommand}"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Style="{StaticResource HorizontalScrollBarPageButton}"  Command="{x:Static ScrollBar.PageRightCommand}"/>
+                                        </Track.IncreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="for_scrollviewer"
+           TargetType="{x:Type ScrollViewer}">
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ScrollContentPresenter  Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                <ScrollBar x:Name="PART_VerticalScrollBar"
+                                       HorizontalAlignment="Right"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       Orientation="Vertical"
+                                       Style="{StaticResource for_scrollbar}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Value="{TemplateBinding VerticalOffset}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                                <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       Orientation="Horizontal"
+                                       Style="{StaticResource for_scrollbar}"
+                                       VerticalAlignment="Bottom"
+                                       Value="{TemplateBinding HorizontalOffset}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <EventTrigger RoutedEvent="ScrollChanged" >
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_VerticalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.8"
+                                        Duration="0:0:1"/>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_VerticalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.2"
+                                        Duration="0:0:1"
+                                        BeginTime="0:0:1"/>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_HorizontalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.8"
+                                        Duration="0:0:1"/>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_HorizontalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.2"
+                                        Duration="0:0:1"
+                                        BeginTime="0:0:1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseEnter"
+                                      SourceName="PART_VerticalScrollBar">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_VerticalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.8"
+                                        Duration="0:0:0.7"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave"
+                                      SourceName="PART_VerticalScrollBar">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_VerticalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.2"
+                                        Duration="0:0:0.7"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseEnter"
+                                      SourceName="PART_HorizontalScrollBar">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_HorizontalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.8"
+                                        Duration="0:0:0.7"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave"
+                                      SourceName="PART_HorizontalScrollBar">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                        Storyboard.TargetName="PART_HorizontalScrollBar"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.2"
+                                        Duration="0:0:0.7"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--进程模板-->
+    </Window.Resources>
+    <Grid>
+        <!--窗口-->
+        <Border CornerRadius="20" Background="#202020" Padding="0">
+            <Grid>
+                <!--背景图-->
+                <Border CornerRadius="20">
+                    <Border.Background>
+                        <ImageBrush x:Name="appBackGround" Stretch="UniformToFill" TileMode="FlipXY" Opacity="0.6"/>
+                    </Border.Background>
+                </Border>
+                <!--<TextBlock x:Name="TestText" Foreground="White" VerticalAlignment="Center" 
+                           HorizontalAlignment="Center" FontSize="15" Text="测试"/>-->
+                <StackPanel Background="Transparent">
+                    <!--标题栏-->
+                    <Border VerticalAlignment="Top" Margin="0,0,0,0" Background="#212121" CornerRadius="20,20,0,0" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+                        <Grid Margin="0,0,0,0">
+                            <TextBlock Text="🛠进程管理器"
+                            Name="title"
+                            Foreground="White"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            Padding="10,0,0,0"/>
+                            <Button Content="--"
+                            FontSize="25"
+                            Style="{StaticResource WindowButton}"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,40,0"
+                            VerticalAlignment="Center"
+                            Click="MinimizeButton_Click"/>
+                            <Button Content="×"
+                            FontSize="25"
+                            Style="{StaticResource WindowButton}"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,0,0"
+                            VerticalAlignment="Center"
+                            Click="HideButton_Click"/>
+                        </Grid>
+                    </Border>
+                    <!--搜索栏-->
+                    <Grid>
+                        <StackPanel Margin ="0,10" Orientation="Horizontal">
+                            <Border Margin ="5,0,0,0" Height="30" Width="605" CornerRadius="5" BorderThickness="0.5" BorderBrush="#d0d0d0">
+                                <Grid>
+                                    <TextBlock Padding="5,0" VerticalAlignment="Center" Foreground="#808080" FontSize="15" Text="程序名称"/>
+                                    <TextBox Padding="5,0" CaretBrush="White" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" 
+                                             Foreground="White" FontSize="15" x:Name="SearchTextBox"></TextBox>
+                                </Grid>
+                            </Border>
+                            <Button Style="{StaticResource MiscButton}" Click="SearchButton_Click" ToolTip="搜索">🔍️</Button>
+                            <Button Style="{StaticResource MiscButton}" Click="ChangeBackground" ToolTip="修改背景">🎨</Button>
+                            <Button Style="{StaticResource MiscButton}" Click="StandSay" ToolTip="开发者想对你说" >💬</Button>
+                        </StackPanel>
+                    </Grid>
+                    <Line Stroke="White" StrokeThickness="0.5" X1="0" Y1="0" X2="720" Y2="0" />
+                    <!--程序控制部分-->
+                    <Grid Height="355">
+                        <ScrollViewer Padding="5" Style="{StaticResource for_scrollviewer}">
+                            <StackPanel x:Name="ProcessPanel" Height="Auto" Opacity="0.7">
+                                <!--一个进程-->
+                                <Border Visibility="Collapsed" x:Name="ProcessBox" Height="30" CornerRadius="5" Background="#404040" Margin="0,5" MouseRightButtonDown="ProProcessRightDown">
+                                    <Grid>
+                                        <TextBlock Name="ProcessName" Margin="5,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" FontSize="15"
+                                            Text="程序" />
+                                        <TextBlock Name="ProcessPath" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Text="c://xxx.exe"/>
+                                        <Button Name="ProcessBtn1" Margin="5,0" ToolTip="启动进程"
+                                                Foreground="#2bd47d" Style="{StaticResource ProcessButton}" Content="▶"/>
+                                        <Button Name="ProcessBtn2" Visibility="Hidden" Margin="30,0" ToolTip="隐藏进程"
+                                                Foreground="#2bd47d" Style="{StaticResource ProcessButton}" Content="🔒"/>
+                                        <Button Name="ProcessBtn3" Visibility="Hidden" Margin="55,0" ToolTip="重启进程"
+                                                Foreground="#d13333" Style="{StaticResource ProcessButton}" Content="🔁"/>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                    <Button Margin="0" Opacity="0.8" Content="🔘添加程序" Style="{StaticResource AddButton}" Click="AddProcessClick"></Button>
+                </StackPanel>
+                <!--弹窗:新的程序-->
+                <Grid Visibility="Hidden" VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="popup">
+                    <Border Background="#404040" CornerRadius="5">
+                        <StackPanel>
+                            <Border CornerRadius="5 5 0 0" Background="#303030" Height="5"></Border>
+                            <TextBlock Margin="10 5" Foreground="Red" FontStyle="Oblique" HorizontalAlignment="Center" FontSize="15" Text="进程名不能有空格，第一个字符不能为数字"/>
+                            <!--程序名-->
+                            <StackPanel Orientation="Horizontal" Margin="5 5 0 0">
+                                <TextBlock Foreground="White" VerticalAlignment="Center" FontSize="15">进程名称</TextBlock>
+                                <Border Background="#303030" Margin="5,0,0,0" Height="30" Width="150" CornerRadius="5">
+                                    <TextBox x:Name="InputNamebox" Padding="5,0" CaretBrush="White" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="15">
+                                    </TextBox>
+                                </Border>
+                            </StackPanel>
+                            <!--程序路径-->
+                            <StackPanel Orientation="Horizontal" Margin="5 5 5 0">
+                                <TextBlock Foreground="White" VerticalAlignment="Center" FontSize="15" Text="进程路径"/>
+                                <Border Background="#303030" Margin="5,0,0,0" Height="30" Width="150" CornerRadius="5">
+                                    <TextBox x:Name="InputPathBox" Padding="5,0" CaretBrush="White" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="15"/>
+                                </Border>
+                                <Button Style="{StaticResource MiscButton}" ToolTip="选择文件" Click="ChooseFile">📁</Button>
+                            </StackPanel>
+                            <Grid Margin="5">
+                                <Button Style="{StaticResource PopupButton}" HorizontalAlignment="Left" Content="取消" Click="AddProcessClick"/>
+                                <Button Style="{StaticResource PopupButton}" HorizontalAlignment="Right" Content="确定" Click="AddRightClick"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
