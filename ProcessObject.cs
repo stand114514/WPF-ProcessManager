@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 
 namespace WPF进程管理器
 {
@@ -7,7 +8,7 @@ namespace WPF进程管理器
         public ProcessObject(string path) => this.path = path;
         private string path;
         private Process process;
-        private bool isShow = true;
+        private bool isShow;
         /// <summary>
         /// 启动进程
         /// </summary>
@@ -16,10 +17,15 @@ namespace WPF进程管理器
         {
             process = new Process();
             process.StartInfo.FileName = path;
+            process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.UseShellExecute = true;
-            try { process.Start(); return true; }
-            catch { return false; }
+            try { 
+                process.Start();
+                isShow = true;
+                return true; 
+            }
+            catch  { return false; }
         }
         /// <summary>
         /// 重启
@@ -28,7 +34,6 @@ namespace WPF进程管理器
         { 
             KillProcess();
             RunProcess();
-            isShow = true;
         }
         /// <summary>
         /// 关闭
@@ -37,23 +42,26 @@ namespace WPF进程管理器
         {
             if(process.HasExited) { return; }
             process.CloseMainWindow();
+            isShow = false;
         }
 
-        /// <summary>
-        /// 如果显示就隐藏，反之显示
-        /// </summary>
-        /// <returns>返回最后的状态</returns>
         public bool ShowProcess()
         {
             if (isShow)
             {
-                MainWindow.ShowWindow(process.MainWindowHandle, 0);
-                isShow = false;
+                try { 
+                    MainWindow.ShowWindow(process.MainWindowHandle, 0);
+                    isShow = false;
+                }//隐藏
+                catch { isShow = true; }
             }
             else
             {
-                MainWindow.ShowWindow(process.MainWindowHandle, 5);
-                isShow = true;
+                try { 
+                    MainWindow.ShowWindow(process.MainWindowHandle, 5);
+                    isShow = true;
+                }//显示
+                catch { isShow = false; }
             }
             return isShow;
         }

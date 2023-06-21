@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 using Button = System.Windows.Controls.Button;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Window = System.Windows.Window;
@@ -47,6 +48,9 @@ namespace WPF进程管理器
             }
             InitializeComponent();
             InitResources();
+            AutoStart();
+            ShowBalloonTip("进程管理器", "进入后台运行");
+            Hide();
         }
         /// <summary>
         /// 初始化资源
@@ -81,6 +85,11 @@ namespace WPF进程管理器
             if (backPath != "null") appBackGround.ImageSource = new BitmapImage(new Uri(backPath));
             CreateTuoPan();
         }
+        //自启
+        private void AutoStart()
+        {
+            foreach (string key in BorderDict.Keys)  StartProcess(key);
+        }
         //创建托盘
         private void CreateTuoPan()
         {
@@ -94,9 +103,9 @@ namespace WPF进程管理器
             System.Windows.Forms.MenuItem openItem = new System.Windows.Forms.MenuItem("👋打开程序");
             openItem.Click += (s, e) => Show();//显示窗口
             contextMenu.MenuItems.Add(openItem);
-            System.Windows.Forms.MenuItem exitItem = new System.Windows.Forms.MenuItem("👻退出程序");
+/*            System.Windows.Forms.MenuItem exitItem = new System.Windows.Forms.MenuItem("👻退出程序");
             exitItem.Click += (s, e) => Close();
-            contextMenu.MenuItems.Add(exitItem);
+            contextMenu.MenuItems.Add(exitItem);*/
             System.Windows.Forms.MenuItem whatItem = new System.Windows.Forms.MenuItem("🚀这是什么");
             whatItem.Click += (s, e) =>
                 ShowBalloonTip("Stand对你说:", "这是什么？我也不知道|･ω･｀)");
@@ -237,12 +246,21 @@ namespace WPF进程管理器
         {
             Button button = (Button)sender;
             string name = (string)button.Tag;
+            StartProcess(name);
+        }
+        /// <summary>
+        /// 启动进程
+        /// </summary>
+        /// <param name="name"></param>
+        void StartProcess(string name)
+        {
             Border border = BorderDict[name];
+            Button button = (Button)border.FindName("ProcessBtn1");
             Button button2 = (Button)border.FindName("ProcessBtn2");
             Button button3 = (Button)border.FindName("ProcessBtn3");
             TextBlock ProcessPath = (TextBlock)border.FindName("ProcessPath");
             //名字已存在
-            if (processDict.ContainsKey(name)) 
+            if (processDict.ContainsKey(name))
             {
                 processDict[name].KillProcess();
                 processDict.Remove(name);//移除
@@ -252,7 +270,8 @@ namespace WPF进程管理器
                 button2.Visibility = Visibility.Hidden;
                 button3.Visibility = Visibility.Hidden;
             }
-            else{
+            else
+            {
                 ProcessObject processObject = new ProcessObject(ProcessPath.Text);
                 if (!processObject.RunProcess())
                 {
@@ -266,6 +285,8 @@ namespace WPF进程管理器
                 button.Foreground = red;
                 button2.Visibility = Visibility.Visible;
                 button3.Visibility = Visibility.Visible;
+                Thread.Sleep(1000); // 暂停 1 秒钟
+                ShowProcess(button2, name);
             }
         }
         //显示隐藏按钮
@@ -273,6 +294,10 @@ namespace WPF进程管理器
         {
             Button button = (Button)sender;
             string name = (string)button.Tag;
+            ShowProcess(button, name);
+        }
+        private void ShowProcess(Button button, string name)
+        {
             if (processDict[name].ShowProcess())//如果返回结果是显示
             {
                 button.Content = buttonUni["隐藏"];

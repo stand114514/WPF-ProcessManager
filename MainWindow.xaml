@@ -484,7 +484,7 @@
     </Window.Resources>
     <Grid>
         <!--窗口-->
-        <Border CornerRadius="20" Background="#202020" Padding="0">
+        <Border CornerRadius="20" Background="#303030" Padding="0" BorderBrush="#202020" BorderThickness="1">
             <Grid>
                 <!--背景图-->
                 <Border CornerRadius="20">
